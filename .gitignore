@@ -1,0 +1,8 @@
+err.txt
+err2.txt
+timer_err.log
+pw_test.txt
+make_icon.py
+test_tk.py
+__pycache__/
+*.pyc
