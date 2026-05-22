@@ -69,6 +69,12 @@ class MiniWindow(tk.Toplevel):
     def set_time(self, txt):
         self._canvas.itemconfig(self._time_lbl, text=txt)
 
+    def set_color(self, color):
+        self._canvas.itemconfig(self._time_lbl, fill=color)
+
+    def bind_click(self, callback):
+        self._canvas.bind("<ButtonPress-1>", lambda e: callback())
+
     def _drag_start(self, e):
         self._dx, self._dy = e.x, e.y
 
@@ -178,15 +184,20 @@ class Timer(tk.Tk):
 
     def _finish(self):
         self._running = False
+        # Показываем галку в мини-окне, клик по нему вернёт настройки
+        if self._mini:
+            self._mini.set_time("✓")
+            self._mini.set_color("#00ff88")
+            self._mini.bind_click(self._reset_to_full)
+        threading.Thread(target=self._alarm, daemon=True).start()
+
+    def _reset_to_full(self):
         if self._mini:
             self._mini.destroy()
             self._mini = None
-        self._canvas.itemconfig(self._time_full, text="✓", fill="#00ff88")
+        self._canvas.itemconfig(self._time_full, text="00:00", fill="white")
         self._btn.config(state="normal", text="▶  Старт")
         self.deiconify()
-        self.after(2000, lambda: self._canvas.itemconfig(
-            self._time_full, text="00:00", fill="white"))
-        threading.Thread(target=self._alarm, daemon=True).start()
 
     def _warn_beep(self):
         for _ in range(2):
